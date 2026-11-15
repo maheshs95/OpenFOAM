@@ -1,0 +1,69 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  8
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 273;
+
+boundaryField
+{
+    codedPatch
+    {
+        type            codedMixed;
+
+		refValue        uniform 0;
+		refGradient     uniform 0;
+		valueFraction   uniform 1;
+
+		name    codedPatchBC;  
+
+		code
+		#{
+		    const scalar t = this->db().time().value();
+		    const scalar pi = constant::mathematical::pi;
+		    
+		    if (t <= 1)
+		    {
+		    	this->valueFraction() = 1;
+		    	this->refValue() = 273+100*sin(0.5*pi*t);
+		    	this->refGrad() = 0;
+		    }
+		    else
+		    {
+		    	this->valueFraction() = 0;
+		    	this->refValue() = 0;
+		    	this->refGrad() = 0;
+		    }
+		
+		#};
+
+    }
+
+    lrbPatch
+    {
+        type            fixedValue;
+        value           uniform 273;
+    }
+
+ 
+    frontAndBack
+    {
+        type            empty;
+        
+    }
+}
+
+// ************************************************************************* //
